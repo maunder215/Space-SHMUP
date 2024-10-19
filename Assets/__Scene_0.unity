@@ -323,7 +323,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabEnemies:
-  - {fileID: 4070209521177695457, guid: f1fcdd6f663684636afb065a3d673d4a, type: 3}
+  - {fileID: 6217192625371338093, guid: 5c7c16f2bc37847ef807c299a6879db0, type: 3}
   enemySpawnPerSecond: 0.5
   enemyInsetDefault: 1.5
   gameRestartDelay: 2
