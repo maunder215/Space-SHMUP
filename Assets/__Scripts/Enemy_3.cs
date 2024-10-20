@@ -9,10 +9,71 @@ public class Enemy_3 : Enemy            // Enemy_3 also extends the Enemy class
     public Vector2 midpointYRange = new Vector2(1.5f, 3);
     [Tooltip("If true, the Bezier points & path are drawn in the Scene pane.")]
     public bool drawDebugInfo = true;
+
+    [Header( "Enemy_3 Private Fields" )]
+    [SerializeField] 
+    private Vector3[] points;
+
+    [SerializeField]
+    private float birthTime;
+
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        points = new Vector3[3];
+
+        points[0] = pos;
+
+        // Set xMin and xMax the same way that Main.SpawnEnemy() does
+        float xMin = -bndCheck.camWidth + bndCheck.radius;
+        float xMax = bndCheck.camWidth + bndCheck.radius;
+
+        // Pick a random middle position above the top of the screen
+        points[2] = Vector3.zero;
+        points[2].y = points.y;
+        points[2].x = Random.Range(xMin, xMax);
+
+        birthTime = Time.time;
+
+        if (drawDebugInfo ) drawDebugInfo();
+    }
+
+
+    public override void Move() {
+        // Bezier curves work based on a u value between 0 & 1
+        float u = ( Time.time - birthTime ) / lifeTime;
+
+        if ( u > 1) {
+            Destroy(this.gameObject);
+             return;
+        }
+
+        transform.rotation = Quaternion.Euler(u * 180, 0, 0);
+
+        u = u - 0.1f * Mathf.Sin( u * Mathf.PI * 2);
+
+        points = Utils.Bezier(u, points);
+    }
+
+    void DrawDebug() {
+        // Draw the three points
+        Debug.DrawLine( points[0], points[1], Color.cyan, lifeTime );
+        Debug.DrawLine( points[1], points[2], Color.yellow, lifeTime );
+
+        // Draw the Bezier Curve
+        float numSections = 20;
+        Vector3 prevPoint = points[0];
+        Coor col;
+        Vector3 pt;
+        for (int i = 1; i <= numSections; i++) {
+            float u = i / numSections;
+            pt = Utils.Bezier(u, points);
+            col = Color.Lerp(Color.cyan, Color.yellow, u);
+            Debug.DrawLine(prevPoint, pt, col, lifeTime );
+            prevPoint = pt;
+        }
+
     }
 
     // Update is called once per frame
