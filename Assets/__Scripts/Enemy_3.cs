@@ -13,7 +13,6 @@ public class Enemy_3 : Enemy            // Enemy_3 also extends the Enemy class
     [Header( "Enemy_3 Private Fields" )]
     [SerializeField] 
     private Vector3[] points;
-
     [SerializeField]
     private float birthTime;
 
@@ -27,16 +26,21 @@ public class Enemy_3 : Enemy            // Enemy_3 also extends the Enemy class
 
         // Set xMin and xMax the same way that Main.SpawnEnemy() does
         float xMin = -bndCheck.camWidth + bndCheck.radius;
-        float xMax = bndCheck.camWidth + bndCheck.radius;
+        float xMax = bndCheck.camWidth - bndCheck.radius;
+
+        points[1] = Vector3.zero;
+        points[1].x = Random.Range(xMin, xMax);
+        float midYMult = Random.Range(midpointYRange[0], midpointYRange[1]);
+        points[1].y = -bndCheck.camHeight * midYMult;
 
         // Pick a random middle position above the top of the screen
         points[2] = Vector3.zero;
-        points[2].y = points.y;
+        points[2].y = pos.y;
         points[2].x = Random.Range(xMin, xMax);
 
         birthTime = Time.time;
 
-        if (drawDebugInfo ) drawDebugInfo();
+        if (drawDebugInfo ) DrawDebug();
     }
 
 
@@ -46,14 +50,14 @@ public class Enemy_3 : Enemy            // Enemy_3 also extends the Enemy class
 
         if ( u > 1) {
             Destroy(this.gameObject);
-             return;
+            return;
         }
 
         transform.rotation = Quaternion.Euler(u * 180, 0, 0);
 
         u = u - 0.1f * Mathf.Sin( u * Mathf.PI * 2);
 
-        points = Utils.Bezier(u, points);
+        pos = Utils.Bezier(u, points);
     }
 
     void DrawDebug() {
@@ -64,9 +68,9 @@ public class Enemy_3 : Enemy            // Enemy_3 also extends the Enemy class
         // Draw the Bezier Curve
         float numSections = 20;
         Vector3 prevPoint = points[0];
-        Coor col;
+        Color col;
         Vector3 pt;
-        for (int i = 1; i <= numSections; i++) {
+        for (int i = 1; i < numSections; i++) {
             float u = i / numSections;
             pt = Utils.Bezier(u, points);
             col = Color.Lerp(Color.cyan, Color.yellow, u);
@@ -74,11 +78,5 @@ public class Enemy_3 : Enemy            // Enemy_3 also extends the Enemy class
             prevPoint = pt;
         }
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
